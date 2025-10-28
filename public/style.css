@@ -1,0 +1,167 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+
+:root {
+  --bg-color: #0e1217;
+  --card-bg: #1a1f27;
+  --accent: #3b82f6;
+  --text-color: #e5e7eb;
+  --muted-text: #9ca3af;
+  --shadow: rgba(0, 0, 0, 0.4);
+  --glow: rgba(207, 207, 207, 0.334);
+}
+
+/* 🌙 Global */
+body {
+  font-family: 'Poppins', sans-serif !important;
+  background: radial-gradient(circle at 20% 30%, #1a2230, #0e1217 60%) !important;
+  color: var(--text-color) !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  transition: background 0.4s ease, color 0.4s ease !important;
+}
+
+* {
+  transition: all 0.3s ease !important;
+  box-sizing: border-box !important;
+}
+
+h1, h5 {
+  color: var(--text-color) !important;
+  text-shadow: 0 2px 6px rgba(59, 130, 246, 0.15) !important;
+}
+
+/* 🌠 Features Grid */
+.features {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)) !important;
+  gap: 25px !important;
+  margin: 60px auto !important;
+  max-width: 900px !important;
+  padding: 25px !important;
+}
+
+.features > div {
+  background: var(--card-bg) !important;
+  padding: 25px !important;
+  border-radius: 16px !important;
+  box-shadow: 0 8px 20px var(--shadow) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  transition: transform 0.4s ease, box-shadow 0.4s ease !important;
+}
+
+.features > div:hover {
+  transform: translateY(-6px) !important;
+  box-shadow: 0 12px 25px var(--glow) !important;
+}
+
+/* 🔘 Audio Section */
+.audio {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+.audio button {
+  border: none !important;
+  border-radius: 50% !important;
+  padding: 18px !important;
+  background: var(--accent) !important;
+  color: white !important;
+  box-shadow: 0 0 20px var(--glow) !important;
+  transition: all 0.4s ease !important;
+}
+
+.audio button:hover {
+  transform: scale(1.1) !important;
+  box-shadow: 0 0 35px rgba(59, 130, 246, 0.8) !important;
+}
+
+/* 🕯️ Header Section */
+#main {
+  background: linear-gradient(145deg, #11161d, #0a0d11) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.6) !important;
+  padding-bottom: 40px !important;
+}
+
+/* ✨ Buttons */
+.btn {
+  border-radius: 12px !important;
+  transition: all 0.3s ease !important;
+}
+
+.btn-light {
+  border: none !important;
+  background-color: aliceblue;
+  box-shadow: 0 0 20px var(--glow) !important;
+}
+
+.btn-light:hover {
+  background-color: #a7acb6 !important;
+  transform: translateY(-3px) !important;
+  box-shadow: 0 0 35px rgba(73, 78, 87, 0.7) !important;
+}
+
+.btn-outline-secondary {
+  color: var(--muted-text) !important;
+  border-color: var(--muted-text) !important;
+}
+
+.btn-outline-secondary:hover {
+  background-color: var(--muted-text) !important;
+  color: var(--bg-color) !important;
+}
+
+/* 🧠 Textarea + Smooth Inputs */
+textarea, input, button {
+  outline: none !important;
+}
+
+textarea {
+  background: var(--card-bg) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: var(--text-color) !important;
+  border-radius: 10px !important;
+  padding: 10px !important;
+  width: 100% !important;
+  transition: all 0.3s ease !important;
+}
+
+textarea:focus {
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 15px var(--glow) !important;
+}
+
+/* 🌫️ Optional Card Hover Scale (for all cards) */
+.card:hover {
+  transform: translateY(-5px) scale(1.02) !important;
+  box-shadow: 0 0 25px rgba(59, 130, 246, 0.5) !important;
+}
+body {
+  font-family: 'Poppins', sans-serif !important;
+  background: linear-gradient(
+    135deg,
+    #0d1117,
+    #111827,
+    #1e293b,
+    #0f172a
+  ) !important;
+  background-size: 400% 400% !important;
+  animation: gradientShift 20s ease infinite !important;
+  color: #e5e7eb !important;
+  min-height: 100vh !important;
+  transition: background 0.5s ease !important;
+}
+
+/* 🌌 Gradient animation */
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
