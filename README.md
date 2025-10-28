@@ -77,7 +77,7 @@ pgsql
 
 
 
-![Dictionary App Screenshot](public/screenshot.png)
+
 🧑‍💻 Author
 I_blame_sumit
 Built with ❤️ using Node.js and Express.
