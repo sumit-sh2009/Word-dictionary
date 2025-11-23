@@ -1,10 +1,15 @@
 import express from "express";
 import axios from "axios";
 import bodyParser from "body-parser";
+import serverless from "serverless-http";
+
+const handler = serverless(app);
+export default handler;
+
 
 const app = express();
 const port = process.env.PORT || 3000;
-export default app;
+
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
