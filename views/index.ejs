@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Dictionary App</title>
     <link rel="stylesheet" href="/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
 </head>
 <body>
-    <div class="px-4 pt-5 my-5  border-bottom" id="main">
+
+    <div class="px-4 pt-5 my-5 border-bottom" id="main">
         <% if (locals.content){ %>
             <h1 class="display-4 fw-bold text-center"><%= content[0].word %></h1>
         <%} else if (locals.error){ %>
@@ -19,106 +19,159 @@
             <h1 class="display-4 fw-bold text-center">Enter your word here</h1>
         <% } %>
 
-            <div class="col-lg-6 mx-auto">
-                <form>
-                    <textarea  rows="1" placeholder="Search" name="user_word" class="my-3 col-12"></textarea>
+        <div class="col-lg-6 mx-auto">
+            <form>
+                <textarea rows="1" placeholder="Search" name="user_word" class="my-3 col-12"></textarea>
+                <div class="d-grid gap-2 d-sm-flex justify-content-sm-center mb-5">
                     <button formmethod="post" formaction="/specific" type="submit" class="btn btn-light btn-lg px-4 me-sm-3">Submit</button>
                     <button formmethod="get" formaction="/random" type="submit" class="btn btn-outline-secondary btn-lg px-4">Generate a random word</button>
-                </form>
-                <div class="d-grid gap-2 d-sm-flex justify-content-sm-center mb-5">
-                    
-                    
                 </div>
-            </div>
+            </form>
+        </div>
     
     <section class="Dictionary">
-  <% if (locals.content) { %>
-    <div class="features">
-      
-      <!-- DEFINITIONS -->
-      <div class="definitions">
-        <h5>Definitions</h5>
-        <% const definitions = content[0].meanings[0].definitions; %>
-        <% if (definitions.length > 0) { %>
-          <ul>
-            <% for (let i = 0; i < Math.min(4, definitions.length); i++) { %>
-              <li><%= definitions[i].definition %></li>
-            <% } %>
-          </ul>
-        <% } else { %>
-          <p>No definitions</p>
-        <% } %>
-      </div>
-
-      <!-- AUDIO -->
-      <div class="audio">
-        <button class="btn btn-primary audio_button">
-          <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" class="bi bi-volume-up" viewBox="0 0 16 16">
-            <path d="M11.536 14.01A8.47 8.47 0 0 0 14.026 8a8.47 8.47 0 0 0-2.49-6.01l-.708.707A7.48 7.48 0 0 1 13.025 8c0 2.071-.84 3.946-2.197 5.303z"/>
-            <path d="M10.121 12.596A6.48 6.48 0 0 0 12.025 8a6.48 6.48 0 0 0-1.904-4.596l-.707.707A5.48 5.48 0 0 1 11.025 8a5.48 5.48 0 0 1-1.61 3.89z"/>
-            <path d="M10.025 8a4.5 4.5 0 0 1-1.318 3.182L8 10.475A3.5 3.5 0 0 0 9.025 8c0-.966-.392-1.841-1.025-2.475l.707-.707A4.5 4.5 0 0 1 10.025 8M7 4a.5.5 0 0 0-.812-.39L3.825 5.5H1.5A.5.5 0 0 0 1 6v4a.5.5 0 0 0 .5.5h2.325l2.363 1.89A.5.5 0 0 0 7 12zM4.312 6.39 6 5.04v5.92L4.312 9.61A.5.5 0 0 0 4 9.5H2v-3h2a.5.5 0 0 0 .312-.11"/>
-          </svg>
-        </button>
-      </div>
-
-      <!-- ANTONYMS -->
-      <div class="antonyms">
-        <h5>Antonyms</h5>
+    <% if (locals.content) { %>
+        
         <% 
-          const antonyms = content[0].meanings[0].antonyms;
-          if (antonyms && antonyms.length > 0) { 
+            // --- 1. SETUP VARIABLES ---
+            let allDefinitions = [];
+            let allSynonyms = [];
+            let allAntonyms = [];
+            let allExamples = [];
+            let audioUrl = null;
+
+            // --- 2. AUDIO LOGIC ---
+            if (content[0].phonetics) {
+                // Find first entry with audio
+                const soundEntry = content[0].phonetics.find(p => p.audio && p.audio !== "");
+                if (soundEntry) {
+                    audioUrl = soundEntry.audio;
+                    // Fix links that start with // instead of https://
+                    if (audioUrl.startsWith('//')) {
+                        audioUrl = 'https:' + audioUrl;
+                    }
+                }
+            }
+
+            // --- 3. DEFINITIONS LOGIC ---
+            // Loop through every meaning (Noun, Verb, etc.)
+            content[0].meanings.forEach(meaning => {
+                
+                // Collect Synonyms/Antonyms
+                if(meaning.synonyms && meaning.synonyms.length > 0) {
+                    allSynonyms.push(...meaning.synonyms);
+                }
+                if(meaning.antonyms && meaning.antonyms.length > 0) {
+                    allAntonyms.push(...meaning.antonyms);
+                }
+
+                // Collect Definitions
+                meaning.definitions.forEach(def => {
+                    allDefinitions.push({
+                        text: def.definition,
+                        type: meaning.partOfSpeech
+                    });
+
+                    // Collect Examples
+                    if(def.example) {
+                        allExamples.push(def.example);
+                    }
+                });
+            });
+
+            // Remove duplicates
+            allSynonyms = [...new Set(allSynonyms)];
+            allAntonyms = [...new Set(allAntonyms)];
         %>
-          <ul>
-            <% antonyms.slice(0, 4).forEach(a => { %>
-              <li><%= a %></li>
-            <% }) %>
-          </ul>
-        <% } else { %>
-          <p>No antonyms found</p>
-        <% } %>
-      </div>
 
-      <!-- SYNONYMS -->
-      <div class="synonyms">
-        <h5>Synonyms</h5>
-        <% 
-          const synonyms = content[0].meanings[0].synonyms;
-          if (synonyms && synonyms.length > 0) { 
-        %>
-          <ul>
-            <% synonyms.slice(0, 4).forEach(s => { %>
-              <li><%= s %></li>
-            <% }) %>
-          </ul>
-        <% } else { %>
-          <p>No synonyms found</p>
-        <% } %>
-      </div>
+        <div class="features">
+            
+            <div class="definitions">
+                <h5>Definitions</h5>
+                <% if (allDefinitions.length > 0) { %>
+                    <ul>
+                        <% for (let i = 0; i < Math.min(4, allDefinitions.length); i++) { %>
+                            <li>
+                                <strong>(<%= allDefinitions[i].type %>)</strong> 
+                                <%= allDefinitions[i].text %>
+                            </li>
+                        <% } %>
+                    </ul>
+                <% } else { %>
+                    <p style="color: aliceblue;">No definitions found.</p>
+                <% } %>
+            </div>
 
-      <!-- EXAMPLES -->
-      <div class="examples">
-        <h5>Examples</h5>
-        <% 
-          const examples = definitions
-            .map(d => d.example)
-            .filter(e => e && e.trim() !== "");
-          if (examples.length > 0) { 
-        %>
-          <ul>
-            <% examples.slice(0, 4).forEach(e => { %>
-              <li><%= e %></li>
-            <% }) %>
-          </ul>
-        <% } else { %>
-          <p>No examples found</p>
-        <% } %>
-      </div>
+            <div class="audio">
+                <% if (audioUrl) { %>
+                    <button class="btn btn-primary audio_button" onclick="playSound('<%= audioUrl %>')">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" class="bi bi-volume-up" viewBox="0 0 16 16">
+                            <path d="M11.536 14.01A8.47 8.47 0 0 0 14.026 8a8.47 8.47 0 0 0-2.49-6.01l-.708.707A7.48 7.48 0 0 1 13.025 8c0 2.071-.84 3.946-2.197 5.303z"/>
+                            <path d="M10.121 12.596A6.48 6.48 0 0 0 12.025 8a6.48 6.48 0 0 0-1.904-4.596l-.707.707A5.48 5.48 0 0 1 11.025 8a5.48 5.48 0 0 1-1.61 3.89z"/>
+                            <path d="M10.025 8a4.5 4.5 0 0 1-1.318 3.182L8 10.475A3.5 3.5 0 0 0 9.025 8c0-.966-.392-1.841-1.025-2.475l.707-.707A4.5 4.5 0 0 1 10.025 8M7 4a.5.5 0 0 0-.812-.39L3.825 5.5H1.5A.5.5 0 0 0 1 6v4a.5.5 0 0 0 .5.5h2.325l2.363 1.89A.5.5 0 0 0 7 12zM4.312 6.39 6 5.04v5.92L4.312 9.61A.5.5 0 0 0 4 9.5H2v-3h2a.5.5 0 0 0 .312-.11"/>
+                        </svg>
+                    </button>
+                <% } else { %>
+                    <button class="btn btn-secondary" disabled>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" class="bi bi-volume-mute" viewBox="0 0 16 16">
+                            <path d="M6.717 3.55A.5.5 0 0 1 7 4v8a.5.5 0 0 1-.812.39L3.825 10.5H1.5A.5.5 0 0 1 1 10V6a.5.5 0 0 1 .5-.5h2.325l2.363-1.89a.5.5 0 0 1 .529-.06zM6 5.04 4.312 6.39A.5.5 0 0 1 4 6.5H2v3h2a.5.5 0 0 1 .312.11L6 10.96zm7.854.606a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708l4-4a.5.5 0 0 1 .708 0zM9.146 5.646a.5.5 0 0 0-.708.708l4 4a.5.5 0 0 0 .708-.708l-4-4z"/>
+                        </svg>
+                    </button>
+                <% } %>
+            </div>
 
-    </div>
-  <% } %>
-</section>
+            <div class="antonyms">
+                <h5>Antonyms</h5>
+                <% if (allAntonyms.length > 0) { %>
+                    <ul>
+                        <% allAntonyms.slice(0, 4).forEach(a => { %>
+                            <li><%= a %></li>
+                        <% }) %>
+                    </ul>
+                <% } else { %>
+                    <p style="color: aliceblue;">No antonyms found</p>
+                <% } %>
+            </div>
 
+            <div class="synonyms">
+                <h5>Synonyms</h5>
+                <% if (allSynonyms.length > 0) { %>
+                    <ul>
+                        <% allSynonyms.slice(0, 4).forEach(s => { %>
+                            <li><%= s %></li>
+                        <% }) %>
+                    </ul>
+                <% } else { %>
+                    <p  style="color: aliceblue;">No synonyms found</p>
+                <% } %>
+            </div>
+
+            <div class="examples">
+                <h5>Examples</h5>
+                <% if (allExamples.length > 0) { %>
+                    <ul>
+                        <% allExamples.slice(0, 4).forEach(e => { %>
+                            <li>"<%= e %>"</li>
+                        <% }) %>
+                    </ul>
+                <% } else { %>
+                    <p  style="color: aliceblue;">No examples found</p>
+                <% } %>
+            </div>
+
+        </div>
+    <% } %>
+    </section>
 </div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+
+<script>
+    function playSound(url) {
+        const audio = new Audio(url);
+        audio.play();
+    }
+</script>
+
 </body>
 </html>
