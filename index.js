@@ -4,7 +4,7 @@ import bodyParser from "body-parser";
 
 const app = express();
 const port = process.env.PORT || 3000;
-
+export default app;
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
@@ -49,8 +49,3 @@ app.post("/specific", async (req, res) => {
 
 
 
-
-app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
-});
-module.exports = app;
